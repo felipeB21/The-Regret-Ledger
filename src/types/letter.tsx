@@ -11,3 +11,14 @@ export interface Letter {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type LetterWithAuthor = Letter & {
+  author: {
+    id: string;
+    name: string | null;
+  } | null;
+};
+
+export type GetUserLettersResponse =
+  | { success: true; letters: LetterWithAuthor[] }
+  | { success: false; error: string };

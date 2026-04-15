@@ -1,10 +1,10 @@
 "use client";
-import { Letter } from "@/types/letter";
+import { LetterWithAuthor } from "@/types/letter";
 import Image from "next/image";
 import { useState } from "react";
 import { format } from "date-fns";
 
-export function LetterUI({ letter }: { letter: Letter[] }) {
+export function LetterUI({ letter }: { letter: LetterWithAuthor[] }) {
   const [globalFont, setGlobalFont] = useState("font-playwrite-ie");
 
   return (
@@ -24,7 +24,7 @@ export function LetterUI({ letter }: { letter: Letter[] }) {
       </div>
 
       <ul className="space-y-12">
-        {letter?.map((lt) => (
+        {letter.map((lt) => (
           <li
             key={lt.id}
             className="group flex flex-col gap-3 border-l-2 border-stone-200 pl-6 pb-2"
@@ -34,6 +34,7 @@ export function LetterUI({ letter }: { letter: Letter[] }) {
                 <h5 className="text-stone-900 font-bold">
                   To: {lt.targetName || "Someone"}
                 </h5>
+
                 <div className="flex items-center gap-1">
                   <Image
                     src="/map.svg"
@@ -61,7 +62,7 @@ export function LetterUI({ letter }: { letter: Letter[] }) {
               <span className="text-[10px] text-stone-400">
                 {lt.isAnonymous
                   ? "— Posted Anonymously"
-                  : `— Written by ${lt.authorId ? "User" : "Guest"}`}
+                  : `— Written by ${lt.author?.name ?? "Anonymous"}`}
               </span>
 
               <span className="text-[10px] text-stone-300">

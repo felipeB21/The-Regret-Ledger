@@ -32,7 +32,7 @@ export default function RootLayout({
       <body>
         <Header />
 
-        <div className="max-w-3xl mx-auto p-5 my-14">{children}</div>
+        <div className="max-w-3xl mx-auto p-5 my-10">{children}</div>
       </body>
     </html>
   );

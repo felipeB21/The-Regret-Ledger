@@ -3,7 +3,6 @@
 import { db } from "@/db";
 import { letter } from "@/db/schema";
 import { getSession } from "@/lib/auth-server";
-import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -65,15 +64,46 @@ export async function getAllLetters() {
   }
 }
 
-export async function getUserLetters(userId: string) {
+export async function getUserLetters(
+  userId: string,
+  max: number = 10,
+  offset: number = 0,
+) {
+  if (!userId) {
+    return {
+      success: false as const,
+      error: "User ID requerido",
+    };
+  }
+
+  const safeLimit = Math.min(max, 50);
+
   try {
-    const letters = await db
-      .select()
-      .from(letter)
-      .where(eq(letter.authorId, userId));
-    return { success: true, letters };
+    const letters = await db.query.letter.findMany({
+      where: (l, { eq }) => eq(l.authorId, userId),
+      with: {
+        author: {
+          columns: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: (l, { desc }) => [desc(l.createdAt)],
+      limit: safeLimit,
+      offset,
+    });
+
+    return {
+      success: true as const,
+      letters,
+    };
   } catch (e) {
     console.error("Error al obtener cartas del usuario:", e);
-    return { error: "Error de base de datos. Inténtalo de nuevo." };
+
+    return {
+      success: false as const,
+      error: "Error de base de datos. Inténtalo de nuevo.",
+    };
   }
 }
